@@ -1,0 +1,24 @@
+version: '3.7'
+services:
+  mysql:
+    image: mysql:5.7
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=svLwt3YjAQuEJgPWG4e3swE45AFpUhEE
+      - MYSQL_DATABASE=lif1005808362083
+      - MYSQL_USER=lif1005808362083
+      - MYSQL_PASSWORD=WyxBDS99nBxtYNjbFvVsZDJLFsU4pNCx
+    volumes:
+      - type: volume
+        source: data
+        target: /var/lib/mysql
+      - type: bind
+        source: ./db/data
+        target: /docker-entrypoint-initdb.d
+      - type: bind
+        source: ./db/config/10_max-allowed-packet.cnf
+        target: /etc/mysql/mysql.conf.d/10_max-allowed-packet.cnf
+
+volumes:
+  data:
