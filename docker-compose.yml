@@ -19,6 +19,36 @@ services:
       - type: bind
         source: ./db/config/10_max-allowed-packet.cnf
         target: /etc/mysql/mysql.conf.d/10_max-allowed-packet.cnf
+  apache:
+    image: lifein19x19:7.1-apache
+    build:
+      context: .
+      dockerfile: Dockerfile.php
+    ports:
+      - "8080:80"
+    environment:
+      - APACHE_RUN_USER=#${APACHE_UID}
+      - APACHE_RUN_GROUP=#${APACHE_GID}
+      - TZ=America/Toronto
+    volumes:
+      - type: bind
+        source: ./forum
+        target: /var/www/html
+      - type: bind
+        source: ./config.php
+        target: /var/www/html/config.php
+      - type: volume
+        source: cache
+        target: /var/www/html/cache
+      - type: bind
+        source: ./data/images
+        target: /var/www/html/images
+      - type: bind
+        source: ./data/files
+        target: /var/www/html/files
+    links:
+      - mysql
 
 volumes:
   data:
+  cache:
