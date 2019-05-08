@@ -1,2 +1,4 @@
 db/data/*.sql
 data/
+
+production.env
