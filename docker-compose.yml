@@ -22,6 +22,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.php
+    hostname: "${ENVIRONMENT_NAME}"
     ports:
       - "8080:80"
     env_file:
