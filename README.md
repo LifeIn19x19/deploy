@@ -6,7 +6,8 @@ changes without affecting the site until they're ready to ship.
 
 This deployment requires a recent version of [Docker](https://docker.com) and
 [Docker Compose](https://docs.docker.com/compose/). It also helps to be an admin
-on L19 since this allows you to 
+on L19 since this allows you to work with an existing database, to test
+compatibility with all our existing posts, uploads, and data.
 
 ## Instructions
 
