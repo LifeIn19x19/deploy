@@ -17,6 +17,13 @@ services:
       - type: bind
         source: ./db/config/10_max-allowed-packet.cnf
         target: /etc/mysql/mysql.conf.d/10_max-allowed-packet.cnf
+      - type: bind
+        source: ./db/config/11_db-mode.cnf
+        target: /etc/mysql/mysql.conf.d/11_db-mode.cnf
+      - type: bind
+        source: ./db/config/12_utf8.cnf
+        target: /etc/mysql/mysql.conf.d/12_utf8.cnf
+
   apache:
     image: lifein19x19:7.1-apache
     build:
