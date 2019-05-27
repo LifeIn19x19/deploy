@@ -3,10 +3,13 @@ version: '3.7'
 services:
   mysql:
     image: mysql:5.7
-    ports:
-      - "3306:3306"
-    env_file:
-      - production.env
+    environment:
+      - ENVIRONMENT_NAME=${ENVIRONMENT_NAME}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - TZ=${TZ}
     volumes:
       - type: volume
         source: data
@@ -23,6 +26,7 @@ services:
       - type: bind
         source: ./db/config/12_utf8.cnf
         target: /etc/mysql/mysql.conf.d/12_utf8.cnf
+    restart: unless-stopped
 
   apache:
     image: lifein19x19:7.1-apache
@@ -31,9 +35,16 @@ services:
       dockerfile: Dockerfile.php
     hostname: "${ENVIRONMENT_NAME}"
     ports:
-      - "8080:80"
-    env_file:
-      - production.env
+      - "${HOST_PORT}:80"
+    environment:
+      - ENVIRONMENT_NAME=${ENVIRONMENT_NAME}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - TZ=${TZ}
+      - APACHE_RUN_USER=${APACHE_RUN_USER}
+      - APACHE_RUN_GROUP=${APACHE_RUN_GROUP}
+    restart: unless-stopped
     volumes:
       - type: bind
         source: ./forum

@@ -35,8 +35,9 @@ appropriate values:
 $ cp production.env.template production.env
 ```
 
-5. Create a `.env` file from the provided template. The default values are
-almost certainly correct already unless you're deploying to prod:
+5. Create a `.env` file from the provided template and fill in appropriate
+values. The default values (in the cases that they exist) are almost certainly
+correct already unless you're deploying to prod:
 ```
 $ cp .env.template .env
 ```
