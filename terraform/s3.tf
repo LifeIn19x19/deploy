@@ -1,10 +1,6 @@
 resource "aws_s3_bucket" "static_error_bucket" {
   bucket = "${var.environment}.lifein19x19.com"
   acl    = "public-read"
-
-  website {
-    index_document = "index.html"
-  }
 }
 
 resource "aws_s3_bucket" "logs_bucket" {
@@ -61,6 +57,17 @@ resource "aws_cloudfront_distribution" "static_distribution" {
     }
   }
 
+  custom_error_response {
+    error_code         = 400
+    response_page_path = "/error.html"
+    response_code      = 200
+  }
+  custom_error_response {
+    error_code         = 404
+    response_page_path = "/error.html"
+    response_code      = 200
+  }
+
   restrictions {
     geo_restriction {
       restriction_type = "none"
@@ -69,6 +76,6 @@ resource "aws_cloudfront_distribution" "static_distribution" {
 
   viewer_certificate {
     acm_certificate_arn = aws_acm_certificate_validation.root_cert_validation.certificate_arn
-    ssl_support_method = "sni-only"
+    ssl_support_method  = "sni-only"
   }
 }
