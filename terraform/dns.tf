@@ -15,7 +15,7 @@ resource "aws_route53_record" "environment_record" {
   }
 }
 
-resource "aws_route53_record" "www_record" {
+resource "aws_route53_record" "www_environment_record" {
   zone_id = data.aws_route53_zone.lifein19x19.id
   name    = "www.${var.environment}.lifein19x19.com"
   type    = "A"
@@ -26,6 +26,40 @@ resource "aws_route53_record" "www_record" {
     evaluate_target_health = false
   }
 }
+
+resource "aws_route53_record" "root_record" {
+  count   = var.environment == "prod" ? 1 : 0
+  zone_id = data.aws_route53_zone.lifein19x19.id
+  name    = "lifein19x19.com"
+  type    = "A"
+
+  records = var.maintenance_mode ? null : [
+    var.root_ip_address
+  ]
+  ttl     = var.maintenance_mode ? null : 300
+
+  dynamic alias {
+    for_each = var.maintenance_mode ? [var.maintenance_mode] : []
+    content {
+      name = aws_cloudfront_distribution.static_distribution.domain_name
+      zone_id = aws_cloudfront_distribution.static_distribution.hosted_zone_id
+      evaluate_target_health = false
+    }
+  }
+}
+
+resource "aws_route53_record" "www_record" {
+  count   = var.environment == "prod" ? 1 : 0
+  zone_id = data.aws_route53_zone.lifein19x19.id
+  name    = "www.lifein19x19.com"
+  type    = "CNAME"
+
+  records = [
+    aws_route53_record.root_record.0.name
+  ]
+  ttl     = 300
+}
+
 
 resource "aws_acm_certificate" "root_cert" {
   provider    = aws.us-east-1

@@ -9,3 +9,7 @@ terraform {
 variable "environment" {
   default = "dev"
 }
+
+variable "maintenance_mode" {
+  default = false
+}
