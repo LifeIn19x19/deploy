@@ -3,7 +3,7 @@ data "aws_route53_zone" "lifein19x19" {
   private_zone = false
 }
 
-resource "aws_route53_record" "root_record" {
+resource "aws_route53_record" "environment_record" {
   zone_id = data.aws_route53_zone.lifein19x19.id
   name    = "${var.environment}.lifein19x19.com"
   type    = "A"
@@ -40,7 +40,7 @@ resource "aws_acm_certificate" "root_cert" {
   }
 }
 
-resource "aws_route53_record" "root_cert_validation_record" {
+resource "aws_route53_record" "environment_cert_validation_record" {
   provider = aws.us-east-1
   name     = aws_acm_certificate.root_cert.domain_validation_options.0.resource_record_name
   type     = aws_acm_certificate.root_cert.domain_validation_options.0.resource_record_type
@@ -49,7 +49,7 @@ resource "aws_route53_record" "root_cert_validation_record" {
   ttl      = 60
 }
 
-resource "aws_route53_record" "www_cert_validation_record" {
+resource "aws_route53_record" "www_environment_cert_validation_record" {
   provider = aws.us-east-1
   name     = aws_acm_certificate.root_cert.domain_validation_options.1.resource_record_name
   type     = aws_acm_certificate.root_cert.domain_validation_options.1.resource_record_type
@@ -61,7 +61,9 @@ resource "aws_route53_record" "www_cert_validation_record" {
 resource "aws_acm_certificate_validation" "root_cert_validation" {
   provider        = aws.us-east-1
   certificate_arn = aws_acm_certificate.root_cert.arn
-  validation_record_fqdns = [aws_route53_record.root_cert_validation_record.fqdn,
-  aws_route53_record.www_cert_validation_record.fqdn]
+  validation_record_fqdns = [
+    aws_route53_record.environment_cert_validation_record.fqdn,
+    aws_route53_record.www_environment_cert_validation_record.fqdn,
+  ]
 }
 
