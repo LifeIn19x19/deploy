@@ -3,7 +3,7 @@ resource "aws_s3_bucket" "static_error_bucket" {
   acl    = "public-read"
 }
 
-resource "aws_s3_bucket" "logs_bucket" {
+data "aws_s3_bucket" "logs_bucket" {
   bucket = "l19-logs"
 }
 
@@ -32,7 +32,7 @@ resource "aws_cloudfront_distribution" "static_distribution" {
 
   logging_config {
     include_cookies = true
-    bucket          = aws_s3_bucket.logs_bucket.bucket_domain_name
+    bucket          = data.aws_s3_bucket.logs_bucket.bucket_domain_name
     prefix          = "${var.environment}/"
   }
 
