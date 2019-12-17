@@ -36,7 +36,12 @@ resource "aws_cloudfront_distribution" "static_distribution" {
     prefix          = "${var.environment}/"
   }
 
-  aliases = ["${var.environment}.lifein19x19.com", "www.${var.environment}.lifein19x19.com"]
+  aliases = [
+    "${var.environment}.lifein19x19.com",
+    "www.${var.environment}.lifein19x19.com",
+    var.environment == "prod" ? "lifein19x19.com" : null,
+    var.environment == "prod" ? "www.lifein19x19.com" : null,
+  ]
 
   default_cache_behavior {
     allowed_methods  = ["GET", "HEAD"]
