@@ -12,4 +12,7 @@ RUN apt-get update && apt-get install -y \
 #    && docker-php-ext-install -j$(nproc) zlib \
 #    && docker-php-ext-install -j$(nproc) imagick
 
+COPY ./config/large-request-uris.conf /etc/apache2/conf-available/large-request-uris.conf
+
+RUN a2enconf large-request-uris
 RUN printf '[PHP]\ndate.timezone = "UTC"\n' > /usr/local/etc/php/conf.d/tzone.ini
