@@ -26,6 +26,8 @@ services:
       - type: bind
         source: ./db/config/12_utf8.cnf
         target: /etc/mysql/mysql.conf.d/12_utf8.cnf
+    networks:
+      - default
     restart: unless-stopped
 
   apache:
@@ -33,6 +35,15 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.php
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.l19.rule: "HostRegexp(`{host:^(www\\.)?(${ENVIRONMENT_NAME}\\.)?lifein19x19.com(:\\d+)?$$}`)"
+      traefik.http.routers.l19.tls.certResolver: "r53resolver"
+      traefik.http.routers.l19.tls.domains[0].main: "lifein19x19.com"
+      traefik.http.routers.l19.tls.domains[0].sans: "www.lifein19x19.com,prod.lifein19x19.com,www.prod.lifein19x19.com"
+      traefik.http.middlewares.l19forumprefix.stripprefix.prefixes: "/forum"
+      traefik.http.routers.l19.middlewares: "l19forumprefix"
+      traefik.docker.network: proxy
     hostname: "${ENVIRONMENT_NAME}"
     ports:
       - "${HOST_PORT}:80"
@@ -58,9 +69,16 @@ services:
       - type: bind
         source: ./data/files
         target: /var/www/html/files
-    links:
-      - mysql
+    networks:
+      - default
+      - proxy
+
 
 volumes:
   data:
   cache:
+
+networks:
+  default:
+  proxy:
+    external: true
