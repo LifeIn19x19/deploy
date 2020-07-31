@@ -8,10 +8,18 @@ resource "aws_route53_record" "environment_record" {
   name    = "${var.environment}.lifein19x19.com"
   type    = "A"
 
-  alias {
-    name                   = aws_cloudfront_distribution.static_distribution.domain_name
-    zone_id                = aws_cloudfront_distribution.static_distribution.hosted_zone_id
-    evaluate_target_health = false
+  records = var.maintenance_mode ? null : [
+    local.root_ip_address
+  ]
+  ttl = var.maintenance_mode ? null : 300
+
+  dynamic alias {
+    for_each = var.maintenance_mode ? [var.maintenance_mode] : []
+    content {
+      name                   = aws_cloudfront_distribution.static_distribution.domain_name
+      zone_id                = aws_cloudfront_distribution.static_distribution.hosted_zone_id
+      evaluate_target_health = false
+    }
   }
 }
 
@@ -20,10 +28,18 @@ resource "aws_route53_record" "www_environment_record" {
   name    = "www.${var.environment}.lifein19x19.com"
   type    = "A"
 
-  alias {
-    name                   = aws_cloudfront_distribution.static_distribution.domain_name
-    zone_id                = aws_cloudfront_distribution.static_distribution.hosted_zone_id
-    evaluate_target_health = false
+  records = var.maintenance_mode ? null : [
+    local.root_ip_address
+  ]
+  ttl = var.maintenance_mode ? null : 300
+
+  dynamic alias {
+    for_each = var.maintenance_mode ? [var.maintenance_mode] : []
+    content {
+      name                   = aws_cloudfront_distribution.static_distribution.domain_name
+      zone_id                = aws_cloudfront_distribution.static_distribution.hosted_zone_id
+      evaluate_target_health = false
+    }
   }
 }
 
@@ -34,15 +50,15 @@ resource "aws_route53_record" "root_record" {
   type    = "A"
 
   records = var.maintenance_mode ? null : [
-    var.root_ip_address
+    local.root_ip_address
   ]
-  ttl     = var.maintenance_mode ? null : 300
+  ttl = var.maintenance_mode ? null : 300
 
   dynamic alias {
     for_each = var.maintenance_mode ? [var.maintenance_mode] : []
     content {
-      name = aws_cloudfront_distribution.static_distribution.domain_name
-      zone_id = aws_cloudfront_distribution.static_distribution.hosted_zone_id
+      name                   = aws_cloudfront_distribution.static_distribution.domain_name
+      zone_id                = aws_cloudfront_distribution.static_distribution.hosted_zone_id
       evaluate_target_health = false
     }
   }
@@ -57,18 +73,18 @@ resource "aws_route53_record" "www_record" {
   records = [
     aws_route53_record.root_record.0.name
   ]
-  ttl     = 300
+  ttl = 300
 }
 
 
 resource "aws_acm_certificate" "root_cert" {
   provider    = aws.us-east-1
   domain_name = "${var.environment}.lifein19x19.com"
-  subject_alternative_names = [
+  subject_alternative_names = compact([
     "www.${var.environment}.lifein19x19.com",
-    var.environment == "prod" ? "lifein19x19.com" : null,
-    var.environment == "prod" ? "www.lifein19x19.com" : null,
-  ]
+    var.environment == "prod" ? "lifein19x19.com" : "",
+    var.environment == "prod" ? "www.lifein19x19.com" : "",
+  ])
   validation_method = "DNS"
 
   lifecycle {
@@ -117,11 +133,11 @@ resource "aws_route53_record" "www_root_cert_validation_record" {
 resource "aws_acm_certificate_validation" "root_cert_validation" {
   provider        = aws.us-east-1
   certificate_arn = aws_acm_certificate.root_cert.arn
-  validation_record_fqdns = [
+  validation_record_fqdns = compact([
     aws_route53_record.environment_cert_validation_record.fqdn,
     aws_route53_record.www_environment_cert_validation_record.fqdn,
-    var.environment == "prod" ? aws_route53_record.root_cert_validation_record.0.fqdn : null,
-    var.environment == "prod" ? aws_route53_record.www_root_cert_validation_record.0.fqdn : null
-  ]
+    var.environment == "prod" ? aws_route53_record.root_cert_validation_record.0.fqdn : "",
+    var.environment == "prod" ? aws_route53_record.www_root_cert_validation_record.0.fqdn : ""
+  ])
 }
 
