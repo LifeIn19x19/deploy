@@ -20,7 +20,7 @@ resource "aws_route53_record" "environment_record" {
   records = var.maintenance_mode ? null : [
     local.root_ip_address
   ]
-  ttl = var.maintenance_mode ? null : 300
+  ttl = var.maintenance_mode ? null : 60
 
   dynamic alias {
     for_each = var.maintenance_mode ? [var.maintenance_mode] : []
@@ -40,7 +40,7 @@ resource "aws_route53_record" "www_environment_record" {
   records = var.maintenance_mode ? null : [
     local.root_ip_address
   ]
-  ttl = var.maintenance_mode ? null : 300
+  ttl = var.maintenance_mode ? null : 60
 
   dynamic alias {
     for_each = var.maintenance_mode ? [var.maintenance_mode] : []
@@ -61,7 +61,7 @@ resource "aws_route53_record" "root_record" {
   records = var.maintenance_mode ? null : [
     local.root_ip_address
   ]
-  ttl = var.maintenance_mode ? null : 300
+  ttl = var.maintenance_mode ? null : 60
 
   dynamic alias {
     for_each = var.maintenance_mode ? [var.maintenance_mode] : []
@@ -82,7 +82,7 @@ resource "aws_route53_record" "www_record" {
   records = [
     aws_route53_record.root_record.0.name
   ]
-  ttl = 300
+  ttl = 60
 }
 
 
