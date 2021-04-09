@@ -3,7 +3,7 @@ data "http" "myip" {
 }
 
 locals {
-  root_ip_address = "${chomp(data.http.myip.body)}"
+  root_ip_address = chomp(data.http.myip.body)
 }
 
 
